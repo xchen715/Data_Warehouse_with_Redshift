@@ -4,12 +4,36 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
+    """
+    Load data from S3 into Rdshift staging Tables.
+    
+    Parameters
+    ----------
+        cur : psycopg2.connect.cursor
+            cursor from psycopg2 connecting to Postgres database.
+        
+        conn : psycopg2.connect
+            psycopg2 connection to Postgres database.
+    
+    """
     for query in copy_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def insert_tables(cur, conn):
+    """
+    Insert data from staging tables into actual tables.
+    
+    Parameters
+    ----------
+        cur : psycopg2.connect.cursor
+            cursor from psycopg2 connecting to Postgres database.
+        
+        conn : psycopg2.connect
+            psycopg2 connection to Postgres database.
+    
+    """
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()

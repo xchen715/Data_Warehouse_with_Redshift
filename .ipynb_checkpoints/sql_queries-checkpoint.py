@@ -7,6 +7,8 @@ config.read('/home/wilson/Data_Engineering_NanoDegree/AWS_Keys/dwh.cfg')
 
 ARN = config.get('IAM_ROLE','ARN')
 LOG_JSONPATH=config.get('S3','LOG_JSONPATH')
+LOG_DATA=config.get('S3','LOG_DATA')
+SONG_DATA=config.get('S3','SONG_DATA')
 # DROP TABLES
 
 staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
@@ -130,13 +132,13 @@ staging_events_copy = ("""
 COPY staging_events FROM '{}'
 CREDENTIALS 'aws_iam_role={}'
 json {} region 'us-west-2';
-""").format('s3://udacity-dend/log-data',ARN,LOG_JSONPATH)
+""").format(LOG_DATA, ARN, LOG_JSONPATH)
 
 staging_songs_copy = ("""
 COPY staging_songs FROM '{}'
 CREDENTIALS 'aws_iam_role={}'
 json 'auto' region 'us-west-2';
-""").format('s3://udacity-dend/song-data/', ARN)
+""").format(SONG_DATA, ARN)
 
 # FINAL TABLES
 
@@ -151,7 +153,11 @@ s.artist_Id,
 e.sessionId,
 e.location,
 e.userAgent
-FROM staging_events e JOIN staging_songs s ON e.song = s.title;
+FROM staging_events e, staging_songs s
+WHERE e.song = s.title
+AND e.artist = s.artist_name
+AND e.length = s.duration
+AND e.page = 'NextSong';
 """)
 
 user_table_insert = ("""
@@ -197,8 +203,7 @@ EXTRACT(WEEK FROM start_time) AS week,
 EXTRACT(MONTH FROM start_time) AS month,
 EXTRACT(YEAR FROM start_time) AS year,
 EXTRACT(WEEKDAY FROM start_time) AS weekday
-FROM (SELECT TIMESTAMP 'epoch' + ts/1000 * INTERVAL '1 second' AS start_time
-FROM staging_events) s;
+FROM songPlay;
 """)
 
 # QUERY LISTS
