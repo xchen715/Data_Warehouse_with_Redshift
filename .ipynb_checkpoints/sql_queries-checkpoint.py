@@ -3,7 +3,7 @@ import configparser
 
 # CONFIG
 config = configparser.ConfigParser()
-config.read('dwh.cfg')
+config.read('/home/wilson/Data_Engineering_NanoDegree/AWS_Keys/dwh.cfg')
 
 ARN = config.get('IAM_ROLE','ARN')
 LOG_JSONPATH=config.get('S3','LOG_JSONPATH')
