@@ -15,7 +15,7 @@ First one is Song Data, each file is in JSON format and contains metadata about 
 `{"num_songs": 1, "artist_id": "ARJIE2Y1187B994AB7", "artist_latitude": null, "artist_longitude": null, "artist_location": "", "artist_name": "Line Renaud", "song_id": "SOUPIRU12A6D4FA1E1", "title": "Der Kleine Dompfaff", "duration": 152.92036, "year": 0}`
 
 Second one is activity log data. Each file is in in JSON format as well.
-![Imgur Image](./image/log_data.png)
+![Imgur Image](./image/log-data.png)
 ## ETL Data PipeLine 
 _________
 **Extract** data from S3 into 2 staging tables in Redshift, staging_events and staging songs.
