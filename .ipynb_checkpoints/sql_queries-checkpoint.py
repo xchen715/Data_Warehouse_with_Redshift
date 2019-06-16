@@ -66,15 +66,22 @@ year               INT
 songplay_table_create = ("""
 CREATE TABLE IF NOT EXISTS songplay
 (
-songplay_id        INT IDENTITY(0,1) PRIMARY KEY SORTKEY,
-start_time         TIMESTAMP REFERENCES dimTime(start_time) DISTKEY,
-user_id            INT REFERENCES dimUser(user_id),
+songplay_id        INT IDENTITY(0,1),
+start_time         TIMESTAMP,
+user_id            INT,
 level              TEXT,
-song_id            TEXT REFERENCES dimSong(song_id),
-artist_id          TEXT REFERENCES dimArtist(artist_id),
+song_id            TEXT,
+artist_id          TEXT,
 session_id         INT,
 location           VARCHAR(2000),
-user_agent         VARCHAR(2000)
+user_agent         VARCHAR(2000),
+PRIMARY KEY (songplay_id),
+FOREIGN KEY (start_time) REFERENCES dimTime(start_time),
+FOREIGN KEY (user_id) REFERENCES dimUser(user_id),
+FOREIGN KEY (song_id) REFERENCES dimSong(song_id),
+FOREIGN KEY (artist_id) REFERENCES dimArtist(artist_id)
+DISTKEY (start_time)
+SORTKEY (songplay_id)
 )
 """)
 
@@ -82,46 +89,51 @@ user_agent         VARCHAR(2000)
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimUser
 (
-user_id            INT NOT NULL PRIMARY KEY,
+user_id            INT NOT NULL,
 first_name         TEXT,
 last_name          TEXT,
 gender             TEXT,
-level              TEXT
+level              TEXT,
+PRIMARY KEY (user_id)
 )
 """)
 
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimSong
 (
-song_id           TEXT NOT NULL PRIMARY KEY,
+song_id           TEXT NOT NULL,
 title             VARCHAR(2000),
 artist_id         TEXT NOT NULL,
 year              INT,
-duration          FLOAT
+duration          FLOAT,
+PRIMARY KEY (song_id)
 )
 """)
 
 artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimArtist
 (
-artist_id         TEXT NOT NULL PRIMARY KEY,
+artist_id         TEXT NOT NULL,
 name              VARCHAR(65535),
 location          VARCHAR(65535),
 lattitude         FLOAT,
-longitude         FLOAT
+longitude         FLOAT,
+PRIMARY KEY (artist_id)
 )
 """)
 
 time_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimTime
 (
-start_time        TIMESTAMP NOT NULL PRIMARY KEY DISTKEY,
+start_time        TIMESTAMP NOT NULL,
 hour              INT,
 day               INT,
 week              INT,
 month             INT,
 year              INT,
 weekday           INT
+PRIMARY KEY (start_time)
+DISTKEY (start_time)
 )
 """)
 
