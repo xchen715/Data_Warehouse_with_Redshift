@@ -75,14 +75,14 @@ artist_id          TEXT,
 session_id         INT,
 location           VARCHAR(2000),
 user_agent         VARCHAR(2000),
-PRIMARY KEY (songplay_id),
-FOREIGN KEY (start_time) REFERENCES dimTime(start_time),
-FOREIGN KEY (user_id) REFERENCES dimUser(user_id),
-FOREIGN KEY (song_id) REFERENCES dimSong(song_id),
-FOREIGN KEY (artist_id) REFERENCES dimArtist(artist_id)
-DISTKEY (start_time)
-SORTKEY (songplay_id)
-)
+PRIMARY KEY(songplay_id),
+FOREIGN KEY(start_time) REFERENCES dimTime(start_time),
+FOREIGN KEY(user_id) REFERENCES dimUser(user_id),
+FOREIGN KEY(song_id) REFERENCES dimSong(song_id),
+FOREIGN KEY(artist_id) REFERENCES dimArtist(artist_id))
+DISTKEY(start_time)
+SORTKEY(songplay_id)
+
 """)
 
 ## Dimension Tables
@@ -94,7 +94,7 @@ first_name         TEXT,
 last_name          TEXT,
 gender             TEXT,
 level              TEXT,
-PRIMARY KEY (user_id)
+PRIMARY KEY(user_id)
 )
 """)
 
@@ -106,7 +106,7 @@ title             VARCHAR(2000),
 artist_id         TEXT NOT NULL,
 year              INT,
 duration          FLOAT,
-PRIMARY KEY (song_id)
+PRIMARY KEY(song_id)
 )
 """)
 
@@ -118,7 +118,7 @@ name              VARCHAR(65535),
 location          VARCHAR(65535),
 lattitude         FLOAT,
 longitude         FLOAT,
-PRIMARY KEY (artist_id)
+PRIMARY KEY(artist_id)
 )
 """)
 
@@ -131,10 +131,9 @@ day               INT,
 week              INT,
 month             INT,
 year              INT,
-weekday           INT
-PRIMARY KEY (start_time)
-DISTKEY (start_time)
-)
+weekday           INT,
+PRIMARY KEY(start_time))
+DISTKEY(start_time)
 """)
 
 # LOAD DATA INTO CLUSTER
@@ -143,7 +142,7 @@ DISTKEY (start_time)
 staging_events_copy = ("""
 COPY staging_events FROM '{}'
 CREDENTIALS 'aws_iam_role={}'
-json {} region 'us-west-2';
+json '{}' region 'us-west-2';
 """).format(LOG_DATA, ARN, LOG_JSONPATH)
 
 staging_songs_copy = ("""
