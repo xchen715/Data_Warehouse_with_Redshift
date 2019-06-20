@@ -25,7 +25,7 @@ staging_events_table_create= ("""
 CREATE TABLE IF NOT EXISTS staging_events 
 (
 eventId            INT IDENTITY(0,1),
-artist             VARCHAR(2000),
+artist             TEXT,
 auth               TEXT,
 firstName          TEXT,
 gender             TEXT,
@@ -33,15 +33,15 @@ itemInSession      INT,
 lastName           TEXT,
 length             FLOAT,
 level              TEXT,
-location           VARCHAR(2000),
+location           TEXT,
 method             TEXT,
 page               TEXT,
 registration       FLOAT,
 sessionId          INT,
-song               VARCHAR(2000),
+song               TEXT,
 status             INT,
 ts                 TEXT,
-userAgent          VARCHAR(2000),
+userAgent          TEXT,
 userId             INT
 )
 """)
@@ -54,9 +54,9 @@ num_songs          INT,
 artist_id          TEXT,
 artist_latitude    FLOAT,
 artist_longitude   FLOAT,
-artist_location    VARCHAR(65535),
-artist_name        VARCHAR(65535),
-title              VARCHAR(2000),
+artist_location    TEXT,
+artist_name        TEXT,
+title              TEXT,
 duration           FLOAT,
 year               INT
 )
@@ -73,8 +73,8 @@ level              TEXT,
 song_id            TEXT,
 artist_id          TEXT,
 session_id         INT,
-location           VARCHAR(2000),
-user_agent         VARCHAR(2000),
+location           TEXT,
+user_agent         TEXT,
 PRIMARY KEY(songplay_id),
 FOREIGN KEY(start_time) REFERENCES dimTime(start_time),
 FOREIGN KEY(user_id) REFERENCES dimUser(user_id),
@@ -82,7 +82,6 @@ FOREIGN KEY(song_id) REFERENCES dimSong(song_id),
 FOREIGN KEY(artist_id) REFERENCES dimArtist(artist_id))
 DISTKEY(start_time)
 SORTKEY(songplay_id)
-
 """)
 
 ## Dimension Tables
@@ -102,7 +101,7 @@ song_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimSong
 (
 song_id           TEXT NOT NULL,
-title             VARCHAR(2000),
+title             TEXT,
 artist_id         TEXT NOT NULL,
 year              INT,
 duration          FLOAT,
@@ -114,8 +113,8 @@ artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimArtist
 (
 artist_id         TEXT NOT NULL,
-name              VARCHAR(65535),
-location          VARCHAR(65535),
+name              TEXT,
+location          TEXT,
 lattitude         FLOAT,
 longitude         FLOAT,
 PRIMARY KEY(artist_id)
