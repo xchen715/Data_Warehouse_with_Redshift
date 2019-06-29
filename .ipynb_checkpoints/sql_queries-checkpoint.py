@@ -4,11 +4,11 @@ import configparser
 # CONFIG
 config = configparser.ConfigParser()
 config.read('/home/wilson/Data_Engineering_NanoDegree/AWS_Keys/dwh.cfg')
-
 ARN = config.get('IAM_ROLE','ARN')
 LOG_JSONPATH=config.get('S3','LOG_JSONPATH')
 LOG_DATA=config.get('S3','LOG_DATA')
 SONG_DATA=config.get('S3','SONG_DATA')
+
 # DROP TABLES
 
 staging_events_table_drop = "DROP TABLE IF EXISTS staging_events"
@@ -42,7 +42,7 @@ song               TEXT,
 status             INT,
 ts                 TEXT,
 userAgent          TEXT,
-userId             INT
+userId             TEXT
 )
 """)
 
@@ -51,24 +51,24 @@ CREATE TABLE IF NOT EXISTS staging_songs
 (
 song_id            TEXT,
 num_songs          INT,
-artist_id          TEXT,
-artist_latitude    FLOAT,
-artist_longitude   FLOAT,
-artist_location    TEXT,
-artist_name        TEXT,
 title              TEXT,
+artist_name        TEXT,
+artist_latitude    FLOAT,
+year               INT,
 duration           FLOAT,
-year               INT
+artist_id          TEXT,
+artist_longitude   FLOAT,
+artist_location    TEXT
 )
 """)
-
+    
 ## Fact Table
 songplay_table_create = ("""
 CREATE TABLE IF NOT EXISTS songplay
 (
 songplay_id        INT IDENTITY(0,1),
 start_time         TIMESTAMP,
-user_id            INT,
+user_id            TEXT,
 level              TEXT,
 song_id            TEXT,
 artist_id          TEXT,
@@ -88,7 +88,7 @@ SORTKEY(songplay_id)
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimUser
 (
-user_id            INT NOT NULL,
+user_id            TEXT,
 first_name         TEXT,
 last_name          TEXT,
 gender             TEXT,
@@ -100,9 +100,9 @@ PRIMARY KEY(user_id)
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimSong
 (
-song_id           TEXT NOT NULL,
+song_id           TEXT,
 title             TEXT,
-artist_id         TEXT NOT NULL,
+artist_id         TEXT,
 year              INT,
 duration          FLOAT,
 PRIMARY KEY(song_id)
@@ -112,7 +112,7 @@ PRIMARY KEY(song_id)
 artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimArtist
 (
-artist_id         TEXT NOT NULL,
+artist_id         TEXT,
 name              TEXT,
 location          TEXT,
 lattitude         FLOAT,
@@ -124,7 +124,7 @@ PRIMARY KEY(artist_id)
 time_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimTime
 (
-start_time        TIMESTAMP NOT NULL,
+start_time        TIMESTAMP,
 hour              INT,
 day               INT,
 week              INT,
@@ -141,21 +141,21 @@ DISTKEY(start_time)
 staging_events_copy = ("""
 COPY staging_events FROM '{}'
 CREDENTIALS 'aws_iam_role={}'
-json '{}' region 'us-west-2';
+JSON '{}' REGION 'us-west-2';
 """).format(LOG_DATA, ARN, LOG_JSONPATH)
 
 staging_songs_copy = ("""
 COPY staging_songs FROM '{}'
 CREDENTIALS 'aws_iam_role={}'
-json 'auto' region 'us-west-2';
-""").format(SONG_DATA, ARN)
+JSON 'auto' REGION 'us-west-2';
+""").format(SONG_DATA, ARN) 
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
 INSERT INTO songplay (start_time,user_id,level,song_id,artist_id,session_id,location,user_agent)
 SELECT 
-TIMESTAMP 'epoch' + e.ts/1000 * INTERVAL '1 second' AS start_time,
+DISTINCT TIMESTAMP 'epoch' + e.ts/1000 * INTERVAL '1 second' AS start_time,
 e.userId,
 e.level,
 s.song_Id,
@@ -163,8 +163,8 @@ s.artist_Id,
 e.sessionId,
 e.location,
 e.userAgent
-FROM staging_events e, staging_songs s
-WHERE e.song = s.title
+FROM staging_events e JOIN staging_songs s
+ON e.song = s.title
 AND e.artist = s.artist_name
 AND e.length = s.duration
 AND e.page = 'NextSong';
@@ -173,39 +173,45 @@ AND e.page = 'NextSong';
 user_table_insert = ("""
 INSERT INTO dimUser (user_id,first_name,last_name,gender,level)
 SELECT
-userId,
+DISTINCT userId,
 firstName,
 lastName,
 gender,
 level
-FROM staging_events;
+FROM staging_events
+WHERE userId IS NOT NULL;
 """)
 
 song_table_insert = ("""
 INSERT INTO dimSong (song_id,title,artist_id,year,duration)
 SELECT
+DISTINCT
 song_id,
 title,
 artist_id,
 year,
 duration
-FROM staging_songs;
+FROM staging_songs
+WHERE song_id IS NOT NULL;
 """)
 
 artist_table_insert = ("""
 INSERT INTO dimArtist (artist_id,name,location,lattitude,longitude)
 SELECT
+DISTINCT
 artist_id,
 artist_name,
 artist_location,
 artist_latitude,
 artist_longitude
-FROM staging_songs;
+FROM staging_songs
+WHERE artist_id IS NOT NULL;
 """)
 
 time_table_insert = ("""
 INSERT INTO dimTime (start_time,hour,day,week,month,year,weekday)
 SELECT
+DISTINCT
 start_time,
 EXTRACT(HOUR FROM start_time) AS hour,
 EXTRACT(DAY FROM start_time) AS day,
@@ -213,7 +219,8 @@ EXTRACT(WEEK FROM start_time) AS week,
 EXTRACT(MONTH FROM start_time) AS month,
 EXTRACT(YEAR FROM start_time) AS year,
 EXTRACT(WEEKDAY FROM start_time) AS weekday
-FROM songPlay;
+FROM songPlay
+WHERE start_time IS NOT NULL;
 """)
 
 # QUERY LISTS
