@@ -49,10 +49,12 @@ def main():
     DB_PORT = config.get('CLUSTER','DB_PORT')
 
     conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(HOST,DB_NAME,DB_USER,DB_PASSWORD,DB_PORT))
+    conn.set_client_encoding('UTF8')
+    #conn.set_client_encoding('UNICODE')
     cur = conn.cursor()
     
     load_staging_tables(cur, conn)
-    insert_tables(cur, conn)
+    #insert_tables(cur, conn)
 
     conn.close()
 

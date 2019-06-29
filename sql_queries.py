@@ -25,40 +25,40 @@ staging_events_table_create= ("""
 CREATE TABLE IF NOT EXISTS staging_events 
 (
 eventId            INT IDENTITY(0,1),
-artist             TEXT,
-auth               TEXT,
-firstName          TEXT,
-gender             TEXT,
+artist             VARCHAR(1024),
+auth               VARCHAR(1024),
+firstName          VARCHAR(1024),
+gender             VARCHAR(1024),
 itemInSession      INT,
 lastName           TEXT,
 length             FLOAT,
-level              TEXT,
-location           TEXT,
-method             TEXT,
-page               TEXT,
+level              VARCHAR(1024),
+location           VARCHAR(1024),
+method             VARCHAR(1024),
+page               VARCHAR(1024),
 registration       FLOAT,
 sessionId          INT,
-song               TEXT,
+song               VARCHAR(1024),
 status             INT,
-ts                 TEXT,
-userAgent          TEXT,
-userId             TEXT
+ts                 VARCHAR(1024),
+userAgent          VARCHAR(1024),
+userId             VARCHAR(1024)
 )
 """)
 
 staging_songs_table_create = ("""
 CREATE TABLE IF NOT EXISTS staging_songs
 (
-song_id            TEXT,
+song_id            VARCHAR(1024),
 num_songs          INT,
-title              TEXT,
-artist_name        TEXT,
+title              VARCHAR(1024),
+artist_name        VARCHAR(1024),
 artist_latitude    FLOAT,
 year               INT,
 duration           FLOAT,
-artist_id          TEXT,
+artist_id          VARCHAR(1024),
 artist_longitude   FLOAT,
-artist_location    TEXT
+artist_location    VARCHAR(1024)
 )
 """)
     
@@ -68,13 +68,13 @@ CREATE TABLE IF NOT EXISTS songplay
 (
 songplay_id        INT IDENTITY(0,1),
 start_time         TIMESTAMP,
-user_id            TEXT,
-level              TEXT,
-song_id            TEXT,
-artist_id          TEXT,
+user_id            VARCHAR(1024),
+level              VARCHAR(1024),
+song_id            VARCHAR(1024),
+artist_id          VARCHAR(1024),
 session_id         INT,
-location           TEXT,
-user_agent         TEXT,
+location           VARCHAR(1024),
+user_agent         VARCHAR(1024),
 PRIMARY KEY(songplay_id),
 FOREIGN KEY(start_time) REFERENCES dimTime(start_time),
 FOREIGN KEY(user_id) REFERENCES dimUser(user_id),
@@ -88,11 +88,11 @@ SORTKEY(songplay_id)
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimUser
 (
-user_id            TEXT,
-first_name         TEXT,
-last_name          TEXT,
-gender             TEXT,
-level              TEXT,
+user_id            VARCHAR(1024),
+first_name         VARCHAR(1024),
+last_name          VARCHAR(1024),
+gender             VARCHAR(1024),
+level              VARCHAR(1024),
 PRIMARY KEY(user_id)
 )
 """)
@@ -100,9 +100,9 @@ PRIMARY KEY(user_id)
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimSong
 (
-song_id           TEXT,
-title             TEXT,
-artist_id         TEXT,
+song_id           VARCHAR(1024),
+title             VARCHAR(1024),
+artist_id         VARCHAR(1024),
 year              INT,
 duration          FLOAT,
 PRIMARY KEY(song_id)
@@ -112,9 +112,9 @@ PRIMARY KEY(song_id)
 artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS dimArtist
 (
-artist_id         TEXT,
-name              TEXT,
-location          TEXT,
+artist_id         VARCHAR(1024),
+name              VARCHAR(1024),
+location          VARCHAR(1024),
 lattitude         FLOAT,
 longitude         FLOAT,
 PRIMARY KEY(artist_id)
